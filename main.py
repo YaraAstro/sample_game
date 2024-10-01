@@ -3,8 +3,10 @@ from kivy.config import Config
 Config.set('graphics', 'width', '900')
 Config.set('graphics', 'height', '400')
 
+from kivy import platform
 from kivy.app import App
 from kivy.uix.widget import Widget
+from kivy.core.window import Window
 from kivy.properties import NumericProperty, Clock
 from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Line
@@ -33,7 +35,34 @@ class MainWidget(Widget):
         # print("INIT W : " + str(self.width) + ", H : " + str(self.height))
         self.init_vertical_lines()
         self.init_horizontal_lines()
+        
+        if self.is_desktop():
+            self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
+            self._keyboard.bind(on_key_down=self._on_keyboard_down)
+            self._keyboard.bind(on_key_up=self._on_keyboard_up)
+        
         Clock.schedule_interval(self.update, 1.0/60.0)
+
+    def _keyboard_closed(self):
+        self._keyboard.unbind(on_key_down=self._on_keyboard_down)
+        self._keyboard.unbind(on_key_up=self._on_keyboard_up)
+        self._keyboard = None
+
+    def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+        if keycode[1] == 'left':
+            self.current_speed_x = self.SPEED_X
+        elif keycode[1] == 'right':
+            self.current_speed_x = - self.SPEED_X
+        return True
+
+    def _on_keyboard_up(self, keyboard, keycode):
+        self.current_speed_x = 0
+        return True
+    
+    def is_desktop (self):
+        if platform in ('win', 'linux', 'macosx'):
+            return True
+        return False
 
     def on_parent (self, widget, parent):
         print("ON PARENT W : " + str(self.width) + ", H : " + str(self.height))
@@ -117,10 +146,10 @@ class MainWidget(Widget):
     
     def on_touch_down(self, touch):
         if touch.x < self.width / 2:
-            print("<- to left")
+            # print("<- to left")
             self.current_speed_x = self.SPEED_X
         else:
-            print("-> to right")
+            # print("-> to right")
             self.current_speed_x = -self.SPEED_X
     
     def on_touch_up(self, touch):
