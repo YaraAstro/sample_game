@@ -8,8 +8,8 @@ class MainWidget(Widget):
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
     
-    V_NB_LINES = 7 # number of vertical lines that we going to use
-    V_LINE_SPACING = .1 # percentage in screen width
+    V_NB_LINES = 10 # number of vertical lines that we going to use
+    V_LINE_SPACING = .2 # percentage in screen width
     vertical_lines = []
 
     def __init__(self, **kwargs):
@@ -43,7 +43,7 @@ class MainWidget(Widget):
     
     def update_vertical_lines (self):
         center_line_x = int(self.width / 2)
-        offset = - int(self.V_NB_LINES / 2)
+        offset = - int(self.V_NB_LINES / 2) + 0.5
         spacing = int(self.V_LINE_SPACING * self.width)
         # self.line.points = [center_x, 0, center_x, 100]
         for i in range(0, self.V_NB_LINES):
