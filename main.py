@@ -35,9 +35,9 @@ class MainWidget(Widget):
     current_offset_x = 0
     current_y_loop = 0
 
-    tile = None
-    tile_x = 0
-    tile_y = 0
+    NB_TILES = 10
+    tiles = []
+    tiles_cordinates = []
 
 
     def __init__(self, **kwargs):
@@ -46,6 +46,7 @@ class MainWidget(Widget):
         self.init_vertical_lines()
         self.init_horizontal_lines()
         self.init_tiles()
+        self.generate_tiles_cordinates()
         
         if self.is_desktop():
             self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
@@ -64,7 +65,13 @@ class MainWidget(Widget):
     def init_tiles (self):
         with self.canvas:
             Color(1, 1, 1)
-            self.tile = Quad()
+            for i in range(0, self.NB_TILES):
+                self.tiles.append(Quad())
+
+
+    def generate_tiles_cordinates (self):
+        for i in range(0, self.NB_TILES):
+            self.tiles_cordinates.append((0, i))
 
 
     def init_vertical_lines (self):
@@ -97,15 +104,18 @@ class MainWidget(Widget):
 
 
     def update_tiles (self):
-        x_min, y_min = self.get_tile_cordinates(self.tile_x, self.tile_y)
-        x_max, y_max = self.get_tile_cordinates(self.tile_x+1, self.tile_y+1)
-        
-        x1, y1 = self.transform(x_min, y_min)   #   2 - 3
-        x2, y2 = self.transform(x_min, y_max)   #   |   |
-        x3, y3 = self.transform(x_max, y_max)   #   1 - 4
-        x4, y4 = self.transform(x_max, y_min)   #
+        for i in range(0, self.NB_TILES):
+            tile = self.tiles[i]
+            tile_cordinates = self.tiles_cordinates[i]
+            x_min, y_min = self.get_tile_cordinates(tile_cordinates[0], tile_cordinates[1])
+            x_max, y_max = self.get_tile_cordinates(tile_cordinates[0]+1, tile_cordinates[1]+1)
+            
+            x1, y1 = self.transform(x_min, y_min)   #   2 - 3
+            x2, y2 = self.transform(x_min, y_max)   #   |   |
+            x3, y3 = self.transform(x_max, y_max)   #   1 - 4
+            x4, y4 = self.transform(x_max, y_min)   #
 
-        self.tile.points = [x1, y1, x2, y2, x3, y3, x4, y4]
+            tile.points = [x1, y1, x2, y2, x3, y3, x4, y4]
 
 
     def update_vertical_lines (self):
