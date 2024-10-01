@@ -9,7 +9,7 @@ from kivy.uix.widget import Widget
 from kivy.core.window import Window
 from kivy.properties import NumericProperty, Clock
 from kivy.graphics.context_instructions import Color
-from kivy.graphics.vertex_instructions import Line
+from kivy.graphics.vertex_instructions import Line, Quad
 
 class MainWidget(Widget):
 
@@ -34,12 +34,17 @@ class MainWidget(Widget):
     current_speed_x = 0
     current_offset_x = 0
 
+    tile = None
+    tile_x = 0
+    tile_y = 0
+
 
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
         # print("INIT W : " + str(self.width) + ", H : " + str(self.height))
         self.init_vertical_lines()
         self.init_horizontal_lines()
+        self.init_tiles()
         
         if self.is_desktop():
             self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
@@ -53,6 +58,12 @@ class MainWidget(Widget):
         if platform in ('win', 'linux', 'macosx'):
             return True
         return False
+
+
+    def init_tiles (self):
+        with self.canvas:
+            Color(1, 1, 1)
+            self.tile = Quad()
 
 
     def init_vertical_lines (self):
@@ -75,6 +86,24 @@ class MainWidget(Widget):
         spacing_y = self.H_LINE_SPACING * self.height 
         line_y = index * spacing_y - self.current_offset_y
         return line_y
+
+
+    def get_tile_cordinates (self, tile_x, tile_y):
+        x = self.get_line_x_from_index(tile_x)
+        y = self.get_line_y_from_index(tile_y)
+        return x , y
+
+
+    def update_tiles (self):
+        x_min, y_min = self.get_tile_cordinates(self.tile_x, self.tile_y)
+        x_max, y_max = self.get_tile_cordinates(self.tile_x+1, self.tile_y+1)
+        
+        x1, y1 = self.transform(x_min, y_min)   #   2 - 3
+        x2, y2 = self.transform(x_min, y_max)   #   |   |
+        x3, y3 = self.transform(x_max, y_max)   #   1 - 4
+        x4, y4 = self.transform(x_max, y_min)   #
+
+        self.tile.points = [x1, y1, x2, y2, x3, y3, x4, y4]
 
 
     def update_vertical_lines (self):
@@ -113,6 +142,7 @@ class MainWidget(Widget):
         time_factor = dt * 60
         self.update_vertical_lines()
         self.update_horizontal_lines()
+        self.update_tiles()
         # self.current_offset_y += self.SPEED * time_factor
 
         spacing_y = self.H_LINE_SPACING * self.height
