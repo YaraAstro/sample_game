@@ -9,11 +9,11 @@ class MainWidget(Widget):
     perspective_point_y = NumericProperty(0)
     
     V_NB_LINES = 10 # number of vertical lines that we going to use
-    V_LINE_SPACING = .2 # percentage in screen width
+    V_LINE_SPACING = .25 # percentage in screen width
     vertical_lines = []
 
     H_NB_LINES = 15 # number of horizontal lines that we going to use
-    H_LINE_SPACING = .2 # percentage in screen height
+    H_LINE_SPACING = .1 # percentage in screen height
     horizontal_lines = []
 
     def __init__(self, **kwargs):
@@ -87,15 +87,17 @@ class MainWidget(Widget):
         return int(x), int(y)
     
     def transform_perspective (self, x, y):
-        tr_y = y * self.perspective_point_y / self.height
-        if tr_y > self.perspective_point_y:
-            tr_y = self.perspective_point_y
+        linear_y = y * self.perspective_point_y / self.height
+        if linear_y > self.perspective_point_y:
+            linear_y = self.perspective_point_y
 
         gap_x = x - self.perspective_point_x
-        gap_y = self.perspective_point_y - tr_y
-        proportion_y = gap_y/self.perspective_point_y # 1 when gap_y == self.perspective_point_y | 0 when gap_y == 0
-        
-        tr_x = self.perspective_point_x + (gap_x * proportion_y)
+        gap_y = self.perspective_point_y - linear_y
+        factor_y = gap_y/self.perspective_point_y # 1 when gap_y == self.perspective_point_y | 0 when gap_y == 0
+        factor_y = pow(factor_y, 4)
+
+        tr_x = self.perspective_point_x + (gap_x * factor_y)
+        tr_y = (1 - factor_y) * self.perspective_point_y
 
         return int(tr_x), int(tr_y)
 
