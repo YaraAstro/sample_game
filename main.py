@@ -1,3 +1,4 @@
+import random
 from kivy.config import Config
 
 Config.set('graphics', 'width', '900')
@@ -27,7 +28,7 @@ class MainWidget(Widget):
     H_LINE_SPACING = .1 # percentage in screen height
     horizontal_lines = []
     
-    SPEED = 1
+    SPEED = 3
     current_offset_y = 0
     
     SPEED_X = 10
@@ -35,7 +36,7 @@ class MainWidget(Widget):
     current_offset_x = 0
     current_y_loop = 0
 
-    NB_TILES = 10
+    NB_TILES = 12
     tiles = []
     tiles_cordinates = []
 
@@ -70,7 +71,8 @@ class MainWidget(Widget):
 
 
     def generate_tiles_cordinates (self):
-        last_y = 0
+        last_y = 0 
+        last_x = 0
         # clean the cordinates that are out of the screen
         for i in range(len(self.tiles_cordinates)-1, 0, -1):
             if self.tiles_cordinates[i][1] < self.current_y_loop:
@@ -79,9 +81,21 @@ class MainWidget(Widget):
         if len(self.tiles_cordinates) > 0:
             last_cordinates = self.tiles_cordinates[-1]
             last_y = last_cordinates[1] + 1
+            last_x = last_cordinates[0]
 
         for i in range(len(self.tiles_cordinates), self.NB_TILES):
-            self.tiles_cordinates.append((0, last_y))
+            r = random.randint(0, 2)
+            self.tiles_cordinates.append((last_x, last_y))
+            if r == 1: # right
+                last_x += 1
+                self.tiles_cordinates.append((last_x, last_y))
+                last_y += 1
+                self.tiles_cordinates.append((last_x, last_y))
+            if r == 2: # left
+                last_x -= 1
+                self.tiles_cordinates.append((last_x, last_y))
+                last_y += 1
+                self.tiles_cordinates.append((last_x, last_y))
             last_y += 1
 
 
@@ -175,7 +189,7 @@ class MainWidget(Widget):
             self.generate_tiles_cordinates()
             print("loop : " + str(self.current_y_loop))
         
-        # self.current_offset_x += self.current_speed_x * time_factor
+        self.current_offset_x += self.current_speed_x * time_factor
 
 
 class GalaxyApp (App):
