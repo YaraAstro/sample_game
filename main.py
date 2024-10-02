@@ -19,8 +19,8 @@ class MainWidget(Widget):
     perspective_point_x = NumericProperty(0)
     perspective_point_y = NumericProperty(0)
     
-    V_NB_LINES = 4 # number of vertical lines that we going to use
-    V_LINE_SPACING = .1 # percentage in screen width
+    V_NB_LINES = 10 # number of vertical lines that we going to use
+    V_LINE_SPACING = .25 # percentage in screen width
     vertical_lines = []
 
     H_NB_LINES = 15 # number of horizontal lines that we going to use
@@ -70,8 +70,19 @@ class MainWidget(Widget):
 
 
     def generate_tiles_cordinates (self):
-        for i in range(0, self.NB_TILES):
-            self.tiles_cordinates.append((0, i))
+        last_y = 0
+        # clean the cordinates that are out of the screen
+        for i in range(len(self.tiles_cordinates)-1, 0, -1):
+            if self.tiles_cordinates[i][1] < self.current_y_loop:
+                del self.tiles_cordinates[i]
+
+        if len(self.tiles_cordinates) > 0:
+            last_cordinates = self.tiles_cordinates[-1]
+            last_y = last_cordinates[1] + 1
+
+        for i in range(len(self.tiles_cordinates), self.NB_TILES):
+            self.tiles_cordinates.append((0, last_y))
+            last_y += 1
 
 
     def init_vertical_lines (self):
@@ -161,6 +172,7 @@ class MainWidget(Widget):
         if self.current_offset_y >= spacing_y:
             self.current_offset_y -= spacing_y
             self.current_y_loop += 1
+            self.generate_tiles_cordinates()
             print("loop : " + str(self.current_y_loop))
         
         # self.current_offset_x += self.current_speed_x * time_factor
