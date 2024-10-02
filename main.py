@@ -25,7 +25,7 @@ class MainWidget(Widget):
     vertical_lines = []
 
     H_NB_LINES = 15 # number of horizontal lines that we going to use
-    H_LINE_SPACING = .1 # percentage in screen height
+    H_LINE_SPACING = .15 # percentage in screen height
     horizontal_lines = []
     
     SPEED = 3
@@ -47,6 +47,7 @@ class MainWidget(Widget):
         self.init_vertical_lines()
         self.init_horizontal_lines()
         self.init_tiles()
+        self.pre_fill_tiles_cordinates()
         self.generate_tiles_cordinates()
         
         if self.is_desktop():
@@ -68,6 +69,12 @@ class MainWidget(Widget):
             Color(1, 1, 1)
             for i in range(0, self.NB_TILES):
                 self.tiles.append(Quad())
+
+
+    def pre_fill_tiles_cordinates (self):
+        # 10 straight tiles
+        for i in range(0, 10):
+            self.tiles_cordinates.append((0, i))
 
 
     def generate_tiles_cordinates (self):
