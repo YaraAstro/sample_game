@@ -85,7 +85,15 @@ class MainWidget(Widget):
 
         for i in range(len(self.tiles_cordinates), self.NB_TILES):
             r = random.randint(0, 2)
+            start_index = - int(self.V_NB_LINES/2) + 1
+            end_index = start_index + self.V_NB_LINES - 1
+            
+            if last_x <= start_index + 1:
+                r = 1
+            if last_x >= end_index - 2:
+                r = 2
             self.tiles_cordinates.append((last_x, last_y))
+            
             if r == 1: # right
                 last_x += 1
                 self.tiles_cordinates.append((last_x, last_y))
