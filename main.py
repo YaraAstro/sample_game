@@ -53,6 +53,7 @@ class MainWidget(RelativeLayout):
 
     menu_title = StringProperty("G  A   L   A   X   Y")
     menu_button_title = StringProperty("S T A R T")
+    score_txt = StringProperty()
 
     state_game_over = False
     state_game_has_started = False
@@ -80,6 +81,7 @@ class MainWidget(RelativeLayout):
         self.current_offset_x = 0
         self.current_y_loop = 0
         self.tiles_cordinates = []
+        self.score_txt = "SCORE : " + str(self.current_y_loop)
         self.pre_fill_tiles_cordinates()
         self.generate_tiles_cordinates()
         self.state_game_over = False
@@ -275,6 +277,7 @@ class MainWidget(RelativeLayout):
             while self.current_offset_y >= spacing_y:
                 self.current_offset_y -= spacing_y
                 self.current_y_loop += 1
+                self.score_txt = "SCORE : " + str(self.current_y_loop)
                 self.generate_tiles_cordinates()
                 print("loop : " + str(self.current_y_loop))
 
