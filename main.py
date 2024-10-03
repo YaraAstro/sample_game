@@ -21,7 +21,7 @@ class MainWidget(Widget):
     perspective_point_y = NumericProperty(0)
     
     V_NB_LINES = 10 # number of vertical lines that we going to use
-    V_LINE_SPACING = .3 # percentage in screen width
+    V_LINE_SPACING = .25 # percentage in screen width
     vertical_lines = []
 
     H_NB_LINES = 15 # number of horizontal lines that we going to use
@@ -44,6 +44,7 @@ class MainWidget(Widget):
     SHIP_HEIGHT = 0.035
     SHIP_BASE_Y = 0.05
     ship = None
+    ship_cordinates = [(0, 0), (0, 0), (0, 0)]
 
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
@@ -80,12 +81,36 @@ class MainWidget(Widget):
         base_y = self.SHIP_BASE_Y * self.height
         ship_half_width = self.SHIP_WIDTH * self.width/2
         ship_height = self.SHIP_HEIGHT * self.height
-        
-        x1, y1 = self.transform(center_x - ship_half_width, base_y)     #      2
-        x2, y2 = self.transform(center_x, base_y + ship_height)         #    /  \
-        x3, y3 = self.transform(center_x + ship_half_width, base_y)     #   1 -- 3
+
+        self.ship_cordinates[0] = (center_x - ship_half_width, base_y)
+        self.ship_cordinates[1] = (center_x, base_y + ship_height)
+        self.ship_cordinates[2] = (center_x + ship_half_width, base_y)
+
+        x1, y1 = self.transform(*self.ship_cordinates[0])     #      2
+        x2, y2 = self.transform(*self.ship_cordinates[1])         #    /  \
+        x3, y3 = self.transform(*self.ship_cordinates[2])     #   1 -- 3
         
         self.ship.points = [x1, y1, x2, y2, x3, y3]
+
+
+    def check_ship_collision (self):
+        for i in range(0, len(self.tiles_cordinates)):
+            ti_x, ti_y = self.tiles_cordinates[i]
+            if ti_y > self.current_y_loop + 1:
+                return False
+            if self.check_ship_collision_with_tile(ti_x, ti_y):
+                return True
+        return False
+
+
+    def check_ship_collision_with_tile (self, ti_x, ti_y):
+        x_min, y_min = self.get_tile_cordinates(ti_x, ti_y)
+        x_max, y_max = self.get_tile_cordinates(ti_x + 1, ti_y + 1)
+        for i in range(0, 3):
+            px, py = self.ship_cordinates[i]
+            if x_min <= px <= x_max and y_min <= py <= y_max:
+                return True
+        return False
 
 
     def init_tiles (self):
@@ -233,6 +258,9 @@ class MainWidget(Widget):
 
         speed_x = self.current_speed_x * self.width / 100
         self.current_offset_x += self.current_speed_x * time_factor
+
+        if not self.check_ship_collision():
+            print("GAME OVER!")
 
 
 class GalaxyApp (App):
