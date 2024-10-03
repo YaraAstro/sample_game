@@ -28,10 +28,10 @@ class MainWidget(Widget):
     H_LINE_SPACING = .15 # percentage in screen height
     horizontal_lines = []
     
-    SPEED = 3
+    SPEED = 1
     current_offset_y = 0
     
-    SPEED_X = 10
+    SPEED_X = 16
     current_speed_x = 0
     current_offset_x = 0
     current_y_loop = 0
@@ -42,7 +42,7 @@ class MainWidget(Widget):
 
     SHIP_WIDTH = .1
     SHIP_HEIGHT = 0.035
-    SHIP_BASE_Y = 0.04
+    SHIP_BASE_Y = 0.05
     ship = None
 
     def __init__(self, **kwargs):
@@ -220,7 +220,9 @@ class MainWidget(Widget):
         self.update_horizontal_lines()
         self.update_tiles()
         self.update_ship()
-        self.current_offset_y += self.SPEED * time_factor
+
+        speed_y = self.SPEED * self.height / 100
+        self.current_offset_y += speed_y * time_factor
 
         spacing_y = self.H_LINE_SPACING * self.height
         if self.current_offset_y >= spacing_y:
@@ -228,7 +230,8 @@ class MainWidget(Widget):
             self.current_y_loop += 1
             self.generate_tiles_cordinates()
             print("loop : " + str(self.current_y_loop))
-        
+
+        speed_x = self.current_speed_x * self.width / 100
         self.current_offset_x += self.current_speed_x * time_factor
 
 
