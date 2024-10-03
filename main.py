@@ -10,7 +10,7 @@ from kivy.uix.widget import Widget
 from kivy.core.window import Window
 from kivy.properties import NumericProperty, Clock
 from kivy.graphics.context_instructions import Color
-from kivy.graphics.vertex_instructions import Line, Quad
+from kivy.graphics.vertex_instructions import Line, Quad, Triangle
 
 class MainWidget(Widget):
 
@@ -21,7 +21,7 @@ class MainWidget(Widget):
     perspective_point_y = NumericProperty(0)
     
     V_NB_LINES = 10 # number of vertical lines that we going to use
-    V_LINE_SPACING = .25 # percentage in screen width
+    V_LINE_SPACING = .3 # percentage in screen width
     vertical_lines = []
 
     H_NB_LINES = 15 # number of horizontal lines that we going to use
@@ -40,6 +40,10 @@ class MainWidget(Widget):
     tiles = []
     tiles_cordinates = []
 
+    SHIP_WIDTH = .1
+    SHIP_HEIGHT = 0.035
+    SHIP_BASE_Y = 0.04
+    ship = None
 
     def __init__(self, **kwargs):
         super(MainWidget, self).__init__(**kwargs)
@@ -47,6 +51,7 @@ class MainWidget(Widget):
         self.init_vertical_lines()
         self.init_horizontal_lines()
         self.init_tiles()
+        self.init_ship()
         self.pre_fill_tiles_cordinates()
         self.generate_tiles_cordinates()
         
@@ -62,6 +67,25 @@ class MainWidget(Widget):
         if platform in ('win', 'linux', 'macosx'):
             return True
         return False
+
+
+    def init_ship (self):
+        with self.canvas:
+            Color(0, 0, 0)
+            self.ship = Triangle()
+
+    
+    def update_ship (self):
+        center_x = self.width / 2
+        base_y = self.SHIP_BASE_Y * self.height
+        ship_half_width = self.SHIP_WIDTH * self.width/2
+        ship_height = self.SHIP_HEIGHT * self.height
+        
+        x1, y1 = self.transform(center_x - ship_half_width, base_y)     #      2
+        x2, y2 = self.transform(center_x, base_y + ship_height)         #    /  \
+        x3, y3 = self.transform(center_x + ship_half_width, base_y)     #   1 -- 3
+        
+        self.ship.points = [x1, y1, x2, y2, x3, y3]
 
 
     def init_tiles (self):
@@ -195,6 +219,7 @@ class MainWidget(Widget):
         self.update_vertical_lines()
         self.update_horizontal_lines()
         self.update_tiles()
+        self.update_ship()
         self.current_offset_y += self.SPEED * time_factor
 
         spacing_y = self.H_LINE_SPACING * self.height
